@@ -1,15 +1,6 @@
 const UNRESOLVED_ACTION_NAME = "unknown-action";
 
 /*
- * Connect:
-      {
-        path: '/api/openapi',
-        authorization: false,
-        aliases: {
-          'GET /openapi.json': 'openapi.generateDocs',
-          'GET /ui': 'openapi.ui',
-        },
-      },
 * Inspired by https://github.com/icebob/kantab/blob/fd8cfe38d0e159937f4e3f2f5857c111cadedf44/backend/mixins/openapi.mixin.js
  */
 module.exports = {

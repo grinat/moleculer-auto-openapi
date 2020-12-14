@@ -7,14 +7,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - uses: ianwalter/puppeteer@v2.0.0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
       - name: Test
         run: |
           npm install
           npm test
-        env:
-          GITHUB_ACTION: true
 
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'

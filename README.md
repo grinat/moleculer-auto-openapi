@@ -1,4 +1,6 @@
 # moleculer-auto-openapi
+Auto generate openapi(swagger) scheme for molecular.
+Scheme generated based on action validation params, routes on all avalaibled services and paths in ApiGateway.
 
 ## Usage
 Create openapi.service.js with content:
@@ -11,10 +13,10 @@ module.exports = {
   settings: {
     // all setting optional
     openapi: {
-      "info": {
+      info: {
         // about project
-        "description": "Foo",
-        "title": "Bar",
+        description: "Foo",
+        title: "Bar",
       },
       tags: [
         // you tags
@@ -33,13 +35,33 @@ module.exports = {
   },
 }
 ```
+And add resolvers to your webapi service:
+```javascript
+module.exports = {
+  name: `api`,
+  mixins: [ApiGateway],
+  settings: {
+    routes: [
+      // moleculer-auto-openapi routes
+      {
+        path: '/api/openapi',
+        aliases: {
+          'GET /openapi.json': 'openapi.generateDocs', // swagger scheme
+          'GET /ui': 'openapi.ui', // ui
+        },
+      },
+    ],
+  },
+};
+```
 
-Describe params:
+Describe params in service:
 ```javascript
 module.exports = {
     actions:{
         update: {
           openapi: {
+            // open api params for route
             summary: "Foo bar baz",
             security: [{ "myBasicAuth": [] }],
           },
@@ -47,7 +69,11 @@ module.exports = {
             $$strict: "remove",
             id: { type: "number", convert: true },
             numberBy: "number",
-            someNum: { $$t: "Is some num", type: "number", convert: true },
+            someNum: {
+               $$t: "Is some num", // label which shown in swagger scheme
+               type: "number",
+               convert: true,
+            },
             types: {
               type: "array",
               $$t: "Types arr",

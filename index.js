@@ -229,7 +229,7 @@ module.exports = {
       },
       handler(ctx) {
         ctx.meta.$responseType = "text/html";
-        const version = '3.30.0';
+        const version = '3.38.0';
 
         return `
       <html>
@@ -239,7 +239,7 @@ module.exports = {
         </head>
         <body>
 
-          <div id="app">
+          <div id="swagger-ui">
             <p>Loading...</p>
             <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and molecular to 0.12</noscript>
           </div>
@@ -250,15 +250,16 @@ module.exports = {
             window.onload = function() {
              SwaggerUIBundle({
                url: "${ctx.params.url || this.settings.schemaPath}",
-               dom_id: '#app',
+               dom_id: '#swagger-ui',
+               deepLinking: true,
                presets: [
                  SwaggerUIBundle.presets.apis,
-                 SwaggerUIBundle.SwaggerUIStandalonePreset
+                 SwaggerUIStandalonePreset,
                ],
-               // layout: "StandaloneLayout",
                plugins: [
                  SwaggerUIBundle.plugins.DownloadUrl
                ],
+               layout: "StandaloneLayout",
              });
             }
           </script>
@@ -492,9 +493,15 @@ module.exports = {
                         type: "object",
                         properties: {
                           file: {
-                            type: "string",
-                            format: "binary",
+                            type: "array",
+                            items: {
+                              type: "string",
+                              format: "binary"
+                            },
                           },
+                          someField: {
+                            type: "string"
+                          }
                         },
                       },
                     },

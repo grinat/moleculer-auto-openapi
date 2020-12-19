@@ -2,6 +2,11 @@
 Auto generate openapi(swagger) scheme for molecular.
 Scheme generated based on action validation params, routes on all avalaibled services and paths in ApiGateway.
 
+## Install
+```shell script
+npm i moleculer-auto-openapi --save
+```
+
 ## Usage
 Create openapi.service.js with content:
 ```javascript

@@ -229,6 +229,9 @@ module.exports = {
       },
       handler(ctx) {
         ctx.meta.$responseType = "text/html";
+        ctx.meta.$responseHeaders = {
+          "Content-Security-Policy-Report-Only": `default-src 'self' unpkg.com; img-src 'self' data:; script-src-elem 'self' 'unsafe-inline' unpkg.com`
+        }
         const version = '3.38.0';
 
         return `

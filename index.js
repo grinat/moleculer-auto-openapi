@@ -26,7 +26,7 @@ module.exports = {
       "paths": {},
       "components": {
         "schemas": {
-          // Standart molecular schemas
+          // Standart moleculer schemas
           "DbMixinList": {
             "type": "object",
             "properties": {
@@ -53,7 +53,7 @@ module.exports = {
         },
         "securitySchemes": {},
         "responses": {
-          // Standart molecular responses
+          // Standart moleculer responses
           "ServerError": {
             "description": "Server errors: 500, 501, 400, 404 and etc...",
             "content": {
@@ -229,23 +229,26 @@ module.exports = {
       },
       handler(ctx) {
         ctx.meta.$responseType = "text/html";
+        ctx.meta.$responseHeaders = {
+          "Content-Security-Policy": `default-src 'self' unpkg.com; img-src 'self' data:; script-src-elem 'self' 'unsafe-inline' unpkg.com`
+        }
         const version = '3.38.0';
 
         return `
       <html>
         <head>
            <title>OpenAPI UI</title>
-           <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui.css"/>
+           <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@${version}/swagger-ui.css"/>
         </head>
         <body>
 
           <div id="swagger-ui">
             <p>Loading...</p>
-            <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and molecular to 0.12</noscript>
+            <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and moleculer to 0.12</noscript>
           </div>
 
-          <script src="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui-bundle.js"></script>
-          <script src="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui-standalone-preset.js"></script>
+          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-bundle.js"></script>
+          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-standalone-preset.js"></script>
           <script>
             window.onload = function() {
              SwaggerUIBundle({
@@ -457,7 +460,7 @@ module.exports = {
 
           if (method === "get" || method === "delete") {
             doc.paths[openapiPath][method].parameters.push(
-              ...this.molecularParamsToQuery(params, addedQueryParams),
+              ...this.moleculerParamsToQuery(params, addedQueryParams),
             );
           } else {
             const schemaName = action;
@@ -564,12 +567,12 @@ module.exports = {
       }
     },
     /**
-     * Convert molecular params to openapi query params
+     * Convert moleculer params to openapi query params
      * @param obj
      * @param exclude{Array<string>}
      * @returns {[]}
      */
-    molecularParamsToQuery(obj = {}, exclude = []) {
+    moleculerParamsToQuery(obj = {}, exclude = []) {
       const out = [];
 
       for (const fieldName in obj) {
@@ -612,7 +615,7 @@ module.exports = {
       return out;
     },
     /**
-     * Convert molecular params to openapi definitions(components schemas)
+     * Convert moleculer params to openapi definitions(components schemas)
      * @param doc
      * @param schemeName
      * @param obj

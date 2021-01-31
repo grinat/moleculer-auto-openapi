@@ -235,17 +235,17 @@ module.exports = {
       <html>
         <head>
            <title>OpenAPI UI</title>
-           <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui.css"/>
+           <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@${version}/swagger-ui.css"/>
         </head>
         <body>
 
           <div id="swagger-ui">
             <p>Loading...</p>
-            <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and molecular to 0.12</noscript>
+            <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and moleculer to 0.12</noscript>
           </div>
 
-          <script src="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui-bundle.js"></script>
-          <script src="https://unpkg.com/swagger-ui-dist@${version}/swagger-ui-standalone-preset.js"></script>
+          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-bundle.js"></script>
+          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-standalone-preset.js"></script>
           <script>
             window.onload = function() {
              SwaggerUIBundle({

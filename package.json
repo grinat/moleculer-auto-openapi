@@ -1,6 +1,6 @@
 {
   "name": "moleculer-auto-openapi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Auto generate openapi(swagger) scheme for molecular",
   "main": "index.js",
   "scripts": {

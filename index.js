@@ -26,7 +26,7 @@ module.exports = {
       "paths": {},
       "components": {
         "schemas": {
-          // Standart molecular schemas
+          // Standart moleculer schemas
           "DbMixinList": {
             "type": "object",
             "properties": {
@@ -53,7 +53,7 @@ module.exports = {
         },
         "securitySchemes": {},
         "responses": {
-          // Standart molecular responses
+          // Standart moleculer responses
           "ServerError": {
             "description": "Server errors: 500, 501, 400, 404 and etc...",
             "content": {
@@ -460,7 +460,7 @@ module.exports = {
 
           if (method === "get" || method === "delete") {
             doc.paths[openapiPath][method].parameters.push(
-              ...this.molecularParamsToQuery(params, addedQueryParams),
+              ...this.moleculerParamsToQuery(params, addedQueryParams),
             );
           } else {
             const schemaName = action;
@@ -567,12 +567,12 @@ module.exports = {
       }
     },
     /**
-     * Convert molecular params to openapi query params
+     * Convert moleculer params to openapi query params
      * @param obj
      * @param exclude{Array<string>}
      * @returns {[]}
      */
-    molecularParamsToQuery(obj = {}, exclude = []) {
+    moleculerParamsToQuery(obj = {}, exclude = []) {
       const out = [];
 
       for (const fieldName in obj) {
@@ -615,7 +615,7 @@ module.exports = {
       return out;
     },
     /**
-     * Convert molecular params to openapi definitions(components schemas)
+     * Convert moleculer params to openapi definitions(components schemas)
      * @param doc
      * @param schemeName
      * @param obj

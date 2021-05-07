@@ -59,6 +59,7 @@
         "parameters": [],
         "responses": {
           "200": {
+            "$ref": "#/components/responses/ReturnedData",
             "description": "",
             "content": {
               "application/json": {
@@ -320,13 +321,43 @@
           "desc": {
             "example": "",
             "type": "string"
+          },
+          "email": {
+            "example": "foo@example.com",
+            "type": "string",
+            "format": "email"
+          },
+          "date": {
+            "example": "1998-01-10T13:00:00.000Z",
+            "type": "string",
+            "format": "date-time"
+          },
+          "uuid": {
+            "example": "10ba038e-48da-487b-96e8-8d3b99b6d18a",
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "example": "https://example.com",
+            "type": "string",
+            "format": "uri"
+          },
+          "shortObject": {
+            "$ref": "#/components/schemas/some.update.shortObject"
+          },
+          "shortObject2": {
+            "$ref": "#/components/schemas/some.update.shortObject2"
           }
         },
         "required": [
           "numberBy",
           "someNum",
           "bars",
-          "someObj"
+          "someObj",
+          "email",
+          "uuid",
+          "url",
+          "shortObject"
         ]
       },
       "some.update.types": {
@@ -373,6 +404,40 @@
             "type": "string"
           }
         }
+      },
+      "some.update.shortObject": {
+        "type": "object",
+        "properties": {
+          "desc": {
+            "example": "",
+            "type": "string"
+          },
+          "url": {
+            "example": "https://example.com",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "some.update.shortObject2": {
+        "type": "object",
+        "properties": {
+          "desc": {
+            "example": "",
+            "type": "string"
+          },
+          "url": {
+            "example": "https://example.com",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "url"
+        ]
       }
     },
     "securitySchemes": {},

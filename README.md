@@ -89,6 +89,15 @@ module.exports = {
                 },
               },
             },
+            email: "email",
+            date: "date|optional|min:0|max:99",
+            uuid: "uuid",
+            url: "url",
+            shortObjectNested: {
+              $$type: "object|optional",
+              desc: { type: "string", optional: true, max: 10000 },
+              url: "url",
+            },
             bars: {
               type: "array",
               $$t: "Bars arr",

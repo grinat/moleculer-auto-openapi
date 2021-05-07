@@ -1,11 +1,22 @@
 const UNRESOLVED_ACTION_NAME = "unknown-action";
 
+const NODE_TYPES = {
+  boolean: "boolean",
+  number: "number",
+  date: "date",
+  uuid: "uuid",
+  email: "email",
+  url: "url",
+  string: "string",
+}
+
 /*
 * Inspired by https://github.com/icebob/kantab/blob/fd8cfe38d0e159937f4e3f2f5857c111cadedf44/backend/mixins/openapi.mixin.js
  */
 module.exports = {
   name: `openapi`,
   settings: {
+    port: process.env.PORT || 3000,
     onlyLocal: false, // build schema from only local services
     schemaPath: "/api/openapi/openapi.json",
     uiPath: "/api/openapi/ui",
@@ -543,7 +554,7 @@ module.exports = {
 
           // add components to root of scheme
           if (doc.paths[openapiPath][method].components) {
-            doc.components = this.mergeComponents(
+            doc.components = this.mergeObjects(
               doc.components,
               doc.paths[openapiPath][method].components,
             );
@@ -621,7 +632,6 @@ module.exports = {
      * @param obj
      * @param exclude{Array<string>}
      */
-    // eslint-disable-next-line sonarjs/cognitive-complexity
     createSchemaFromParams(doc, schemeName, obj, exclude = []) {
       // Schema model
       // https://github.com/OAI/OpenAPI-Specification/blob/b748a884fa4571ffb6dd6ed9a4d20e38e41a878c/versions/3.0.3.md#models-with-polymorphism-support
@@ -637,20 +647,36 @@ module.exports = {
         if (fieldName === "$$t") {
           def.description = obj[fieldName];
         }
-        // skip system field in validator scheme
-        if (fieldName.startsWith("$$")) {
-          continue;
-        }
-        if (exclude.includes(fieldName)) {
-          continue;
-        }
 
         let node = obj[fieldName];
         const nextSchemeName = `${schemeName}.${fieldName}`;
 
+        if (
+          // expand $$type: "object|optional"
+          node && node.$$type && node.$$type.includes('object')
+        ) {
+          node = {
+            type: 'object',
+            optional: node.$$type.includes('optional'),
+            $$t: node.$$t || '',
+            props: {
+              ...node,
+            }
+          }
+        } else if (
+          // skip system field in validator scheme
+          fieldName.startsWith("$$")
+        ) {
+          continue;
+        }
+
+        if (exclude.includes(fieldName)) {
+          continue;
+        }
+
         // expand from short rule to full
         if (!(node && node.type)) {
-          node = { type: node };
+          node = this.expandShortDefinition(node);
         }
 
         // mark as required
@@ -713,20 +739,39 @@ module.exports = {
       }
 
       switch (node.type) {
-        case "boolean":
+        case NODE_TYPES.boolean:
           return {
             example: false,
             type: "boolean",
           };
-        case "number":
+        case NODE_TYPES.number:
           return {
             example: null,
             type: "number",
           };
-        case "date":
+        case NODE_TYPES.date:
           return {
             example: "1998-01-10T13:00:00.000Z",
             type: "string",
+            format: "date-time",
+          };
+        case NODE_TYPES.uuid:
+          return {
+            example: "10ba038e-48da-487b-96e8-8d3b99b6d18a",
+            type: "string",
+            format: "uuid",
+          };
+        case NODE_TYPES.email:
+          return {
+            example: "foo@example.com",
+            type: "string",
+            format: "email",
+          };
+        case NODE_TYPES.url:
+          return {
+            example: "https://example.com",
+            type: "string",
+            format: "uri",
           };
         default:
           return {
@@ -739,7 +784,16 @@ module.exports = {
       for (const key in toMerge) {
         // merge components
         if (key === "components") {
-          orig[key] = this.mergeComponents(
+          orig[key] = this.mergeObjects(
+            orig[key],
+            toMerge[key],
+          );
+          continue;
+        }
+
+        // merge responses
+        if (key === "responses") {
+          orig[key] = this.mergeObjects(
             orig[key],
             toMerge[key],
           );
@@ -751,7 +805,7 @@ module.exports = {
       }
       return orig;
     },
-    mergeComponents(orig = {}, toMerge = {}) {
+    mergeObjects(orig = {}, toMerge = {}) {
       for (const key in toMerge) {
         orig[key] = {
           ...(orig[key] || {}),
@@ -826,8 +880,34 @@ module.exports = {
       }
       return output;
     },
+    expandShortDefinition(shortDefinition) {
+      const node = {
+        type: "string",
+      };
+
+      let params = shortDefinition.split('|');
+      params = params.map(v => v.trim());
+
+      if (params.includes('optional')) {
+        node.optional = true;
+      }
+
+      for (const type of Object.values(NODE_TYPES)) {
+        if (params.includes(type)) {
+          node.type = type;
+          break;
+        } else if (params.includes(`${type}[]`)) {
+          const [arrayType,] = node.type.split("[");
+          node.type = "array";
+          node.items = arrayType;
+          break;
+        }
+      }
+
+      return node;
+    },
   },
   started() {
-    this.logger.info(`📜OpenAPI Docs server is available at http://0.0.0.0:${process.env.PORT || 3000}${this.settings.uiPath}`);
+    this.logger.info(`📜OpenAPI Docs server is available at http://0.0.0.0:${this.settings.port}${this.settings.uiPath}`);
   },
 };

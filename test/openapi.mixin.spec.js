@@ -96,6 +96,20 @@ const SomeService = {
         },
         someBool: { type: "boolean", optional: true },
         desc: { type: "string", optional: true, max: 10000 },
+        email: "email",
+        date: "date|optional|min:0|max:99",
+        uuid: "uuid",
+        url: "url",
+        shortObject: {
+          $$type: "object",
+          desc: { type: "string", optional: true, max: 10000 },
+          url: "url",
+        },
+        shortObject2: {
+          $$type: "object|optional",
+          desc: { type: "string", optional: true, max: 10000 },
+          url: "url",
+        }
       },
       handler() {},
     },

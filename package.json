@@ -1,8 +1,9 @@
 {
   "name": "moleculer-auto-openapi",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Auto generate openapi(swagger) scheme for molecular",
   "main": "index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "jest --verbose --runInBand --coverage test/*"
   },

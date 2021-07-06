@@ -166,13 +166,43 @@
         ],
         "parameters": [
           {
+            "name": "roles[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "example": "user",
+                "type": "string",
+                "enum": [
+                  "user",
+                  "admin"
+                ]
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "sex",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "male",
+                "female"
+              ],
+              "example": "male"
+            }
+          },
+          {
             "name": "populate[]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
+                "example": "",
                 "type": "string"
-              }
+              },
+              "minItems": 2,
+              "maxItems": 2
             }
           },
           {
@@ -181,28 +211,38 @@
             "schema": {
               "type": "array",
               "items": {
+                "example": "",
                 "type": "string"
-              }
+              },
+              "minItems": 2,
+              "maxItems": 2
             }
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "string"
+              "example": null,
+              "type": "number",
+              "minLength": 0,
+              "maxLength": 0
             }
           },
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "string"
+              "example": null,
+              "type": "number",
+              "minLength": 0,
+              "maxLength": 0
             }
           },
           {
             "in": "query",
             "name": "sort",
             "schema": {
+              "example": "",
               "type": "string"
             }
           },
@@ -210,7 +250,8 @@
             "in": "query",
             "name": "search",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "find me now"
             }
           },
           {
@@ -219,8 +260,11 @@
             "schema": {
               "type": "array",
               "items": {
+                "example": "",
                 "type": "string"
-              }
+              },
+              "minItems": 2,
+              "maxItems": 2
             }
           },
           {
@@ -229,8 +273,11 @@
             "schema": {
               "type": "array",
               "items": {
+                "example": "",
                 "type": "string"
-              }
+              },
+              "minItems": 2,
+              "maxItems": 2
             }
           }
         ],
@@ -287,6 +334,25 @@
       "some.update": {
         "type": "object",
         "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "example": "user",
+              "type": "string",
+              "enum": [
+                "user",
+                "admin"
+              ]
+            }
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "default": "female"
+          },
           "numberBy": {
             "example": null,
             "type": "number"
@@ -299,6 +365,14 @@
           "types": {
             "description": "Types arr",
             "type": "array",
+            "default": [
+              {
+                "id": 1,
+                "typeId": 5
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1,
             "items": {
               "$ref": "#/components/schemas/some.update.types"
             }
@@ -306,6 +380,8 @@
           "bars": {
             "description": "Bars arr",
             "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
             "items": {
               "$ref": "#/components/schemas/some.update.bars"
             }
@@ -320,7 +396,9 @@
           },
           "desc": {
             "example": "",
-            "type": "string"
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
           },
           "email": {
             "example": "foo@example.com",
@@ -350,15 +428,19 @@
           }
         },
         "required": [
+          "sex",
           "numberBy",
           "someNum",
+          "types",
           "bars",
           "someObj",
           "email",
           "uuid",
           "url",
           "shortObject"
-        ]
+        ],
+        "minItems": 1,
+        "maxItems": 2
       },
       "some.update.types": {
         "type": "object",
@@ -371,7 +453,13 @@
             "example": null,
             "type": "number"
           }
-        }
+        },
+        "default": [
+          {
+            "id": 1,
+            "typeId": 5
+          }
+        ]
       },
       "some.update.bars": {
         "type": "object",
@@ -403,6 +491,9 @@
             "example": "",
             "type": "string"
           }
+        },
+        "default": {
+          "name": "bar"
         }
       },
       "some.update.shortObject": {

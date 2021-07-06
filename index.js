@@ -8,6 +8,7 @@ const NODE_TYPES = {
   email: "email",
   url: "url",
   string: "string",
+  enum: "enum",
 }
 
 /*
@@ -605,9 +606,14 @@ module.exports = {
             "in": "query",
             "schema": {
               "type": "array",
-              "items": {
-                "type": "string",
-              },
+              "items": this.getTypeAndExample({
+                default: node.default,
+                enum: node.enum,
+                type: node.items,
+              }),
+              unique: node.unique,
+              minItems: node.length || node.min,
+              maxItems: node.length || node.max,
             },
           };
           out.push(item);
@@ -619,7 +625,7 @@ module.exports = {
           "in": "query",
           "name": fieldName,
           "description": node.$$t,
-          "schema": { type: "string" },
+          "schema": this.getTypeAndExample(node),
         });
       }
 
@@ -631,14 +637,16 @@ module.exports = {
      * @param schemeName
      * @param obj
      * @param exclude{Array<string>}
+     * @param parentNode
      */
-    createSchemaFromParams(doc, schemeName, obj, exclude = []) {
+    createSchemaFromParams(doc, schemeName, obj, exclude = [], parentNode = {}) {
       // Schema model
       // https://github.com/OAI/OpenAPI-Specification/blob/b748a884fa4571ffb6dd6ed9a4d20e38e41a878c/versions/3.0.3.md#models-with-polymorphism-support
       const def = {
         "type": "object",
         "properties": {},
         "required": [],
+        default: parentNode.default,
       };
       doc.components.schemas[schemeName] = def;
 
@@ -681,9 +689,12 @@ module.exports = {
 
         // mark as required
         if (node.type === "array") {
-          if (node.min || node.length) {
+          if (node.min || node.length || node.max) {
             def.required.push(fieldName);
+            def.minItems = node.length || node.min;
+            def.maxItems = node.length || node.max;
           }
+          def.unique = node.unique;
         } else if (!node.optional) {
           def.required.push(fieldName);
         }
@@ -694,8 +705,11 @@ module.exports = {
         };
 
         if (node.type === "object") {
-          def.properties[fieldName].$ref = `#/components/schemas/${nextSchemeName}`;
-          this.createSchemaFromParams(doc, nextSchemeName, node.props);
+          def.properties[fieldName] = {
+            ...def.properties[fieldName],
+            $ref: `#/components/schemas/${nextSchemeName}`,
+          };
+          this.createSchemaFromParams(doc, nextSchemeName, node.props, [], node);
           continue;
         }
 
@@ -704,11 +718,15 @@ module.exports = {
           def.properties[fieldName] = {
             ...def.properties[fieldName],
             type: "array",
+            default: node.default,
+            unique: node.unique,
+            minItems: node.length || node.min,
+            maxItems: node.length || node.max,
             items: {
               $ref: `#/components/schemas/${nextSchemeName}`,
             },
           };
-          this.createSchemaFromParams(doc, nextSchemeName, node.items.props);
+          this.createSchemaFromParams(doc, nextSchemeName, node.items.props, [], node);
           continue;
         }
 
@@ -717,7 +735,14 @@ module.exports = {
           def.properties[fieldName] = {
             ...def.properties[fieldName],
             type: "array",
-            items: this.getTypeAndExample(node.items),
+            items: this.getTypeAndExample({
+              default: node.default,
+              enum: node.enum,
+              type: node.items,
+            }),
+            unique: node.unique,
+            minItems: node.length || node.min,
+            maxItems: node.length || node.max,
           };
           continue;
         }
@@ -737,48 +762,78 @@ module.exports = {
       if (!node) {
         node = {};
       }
+      let out = {};
 
       switch (node.type) {
         case NODE_TYPES.boolean:
-          return {
+          out = {
             example: false,
             type: "boolean",
           };
+          break;
         case NODE_TYPES.number:
-          return {
+          out = {
             example: null,
             type: "number",
           };
+          break;
         case NODE_TYPES.date:
-          return {
+          out = {
             example: "1998-01-10T13:00:00.000Z",
             type: "string",
             format: "date-time",
           };
+          break;
         case NODE_TYPES.uuid:
-          return {
+          out = {
             example: "10ba038e-48da-487b-96e8-8d3b99b6d18a",
             type: "string",
             format: "uuid",
           };
+          break;
         case NODE_TYPES.email:
-          return {
+          out = {
             example: "foo@example.com",
             type: "string",
             format: "email",
           };
+          break;
         case NODE_TYPES.url:
-          return {
+          out = {
             example: "https://example.com",
             type: "string",
             format: "uri",
           };
+          break;
+        case NODE_TYPES.enum:
+          out = {
+            type: "string",
+            enum: node.values,
+            example: node.values ? node.values[0] : undefined,
+          };
+          break;
         default:
-          return {
+          out = {
             example: "",
             type: "string",
           };
+          break;
       }
+
+      if (node.enum) {
+        out.example = node.enum[0];
+        out.enum = node.enum;
+      }
+
+      if (node.default) {
+        out.default = node.default;
+        delete out.example;
+      }
+
+      out.minLength = node.length || node.min;
+      out.maxLength = node.length || node.min;
+
+      return out;
     },
     mergePathItemObjects(orig = {}, toMerge = {}) {
       for (const key in toMerge) {

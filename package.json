@@ -1,6 +1,6 @@
 {
   "name": "moleculer-auto-openapi",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Auto generate openapi(swagger) scheme for molecular",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -30,6 +30,6 @@
   "devDependencies": {
     "jest": "^26.6.3",
     "moleculer": "^0.14.13",
-    "moleculer-web": "^0.10.0-beta3"
+    "moleculer-web": "^0.10.0-beta4"
   }
 }

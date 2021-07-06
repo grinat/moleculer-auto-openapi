@@ -62,12 +62,16 @@ const SomeService = {
       },
       params: {
         $$strict: "remove",
-        id: { type: "number", convert: true },
+        roles: { type: "array", items: "string", enum: [ "user", "admin" ] },
+        sex: { type: "enum", values: ["male", "female"], default: "female" },
+        id: { type: "number", convert: true, default: 5 },
         numberBy: "number",
         someNum: { $$t: "Is some num", type: "number", convert: true },
         types: {
           type: "array",
           $$t: "Types arr",
+          default: [{ id: 1, typeId: 5 }],
+          length: 1,
           items: {
             type: "object", strict: "remove", props: {
               id: { type: "number", optional: true },
@@ -79,6 +83,7 @@ const SomeService = {
           type: "array",
           $$t: "Bars arr",
           min: 1,
+          max: 2,
           items: {
             type: "object", strict: "remove", props: {
               id: { type: "number", optional: true },
@@ -88,6 +93,7 @@ const SomeService = {
         },
         someObj: {
           $$t: "Some obj",
+          default: { name: "bar" },
           type: "object", strict: "remove", props: {
             id: { $$t: "Some obj ID", type: "number", optional: true },
             numberId: { type: "number", optional: true },
@@ -95,7 +101,7 @@ const SomeService = {
           },
         },
         someBool: { type: "boolean", optional: true },
-        desc: { type: "string", optional: true, max: 10000 },
+        desc: { type: "string", optional: true, max: 10, min: 4, },
         email: "email",
         date: "date|optional|min:0|max:99",
         uuid: "uuid",
@@ -121,6 +127,8 @@ const SomeService = {
         keys: ["populate", "fields", "limit", "offset", "sort", "search", "searchFields", "query"],
       },
       params: {
+        roles: { type: "array", items: "string", enum: [ "user", "admin" ] },
+        sex: { type: "enum", values: ["male", "female"] },
         populate: [
           { type: "string", optional: true },
           { type: "array", optional: true, items: "string" },
@@ -132,7 +140,7 @@ const SomeService = {
         limit: { type: "number", integer: true, min: 0, optional: true, convert: true },
         offset: { type: "number", integer: true, min: 0, optional: true, convert: true },
         sort: { type: "string", optional: true },
-        search: { type: "string", optional: true },
+        search: { type: "string", optional: true, default: "find me now" },
         searchFields: [
           { type: "string", optional: true },
           { type: "array", optional: true, items: "string" },

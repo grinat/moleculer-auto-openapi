@@ -63,66 +63,71 @@ module.exports = {
 Describe params in service:
 ```javascript
 module.exports = {
-    actions:{
-        update: {
-          openapi: {
-            // open api params for route
-            summary: "Foo bar baz",
-            security: [{ "myBasicAuth": [] }],
+  actions: {
+    update: {
+      openapi: {
+        summary: "Foo bar baz",
+      },
+      params: {
+        $$strict: "remove",
+        roles: { type: "array", items: "string", enum: [ "user", "admin" ] },
+        sex: { type: "enum", values: ["male", "female"], default: "female" },
+        id: { type: "number", convert: true, default: 5 },
+        numberBy: "number",
+        someNum: { $$t: "Is some num", type: "number", convert: true },
+        types: {
+          type: "array",
+          $$t: "Types arr",
+          default: [{ id: 1, typeId: 5 }],
+          length: 1,
+          items: {
+            type: "object", strict: "remove", props: {
+              id: { type: "number", optional: true },
+              typeId: { type: "number", optional: true },
+            },
           },
-          params: {
-            $$strict: "remove",
-            id: { type: "number", convert: true },
-            numberBy: "number",
-            someNum: {
-               $$t: "Is some num", // label which shown in swagger scheme
-               type: "number",
-               convert: true,
-            },
-            types: {
-              type: "array",
-              $$t: "Types arr",
-              items: {
-                type: "object", strict: "remove", props: {
-                  id: { type: "number", optional: true },
-                  typeId: { type: "number", optional: true },
-                },
-              },
-            },
-            email: "email",
-            date: "date|optional|min:0|max:99",
-            uuid: "uuid",
-            url: "url",
-            shortObjectNested: {
-              $$type: "object|optional",
-              desc: { type: "string", optional: true, max: 10000 },
-              url: "url",
-            },
-            bars: {
-              type: "array",
-              $$t: "Bars arr",
-              min: 1,
-              items: {
-                type: "object", strict: "remove", props: {
-                  id: { type: "number", optional: true },
-                  fooNum: { $$t: "fooNum", type: "number", optional: true },
-                },
-              },
-            },
-            someObj: {
-              $$t: "Some obj",
-              type: "object", strict: "remove", props: {
-                id: { $$t: "Some obj ID", type: "number", optional: true },
-                numberId: { type: "number", optional: true },
-                name: { type: "string", optional: true, max: 100 },
-              },
-            },
-            someBool: { type: "boolean", optional: true },
-            desc: { type: "string", optional: true, max: 10000 },
-          },
-          handler() {},
         },
-    }
+        bars: {
+          type: "array",
+          $$t: "Bars arr",
+          min: 1,
+          max: 2,
+          items: {
+            type: "object", strict: "remove", props: {
+              id: { type: "number", optional: true },
+              fooNum: { $$t: "fooNum", type: "number", optional: true },
+            },
+          },
+        },
+        someObj: {
+          $$t: "Some obj",
+          default: { name: "bar" },
+          type: "object", strict: "remove", props: {
+            id: { $$t: "Some obj ID", type: "number", optional: true },
+            numberId: { type: "number", optional: true },
+            name: { type: "string", optional: true, max: 100 },
+          },
+        },
+        someBool: { type: "boolean", optional: true },
+        desc: { type: "string", optional: true, max: 10, min: 4, },
+        email: "email",
+        date: "date|optional|min:0|max:99",
+        uuid: "uuid",
+        url: "url",
+        shortObject: {
+          $$type: "object",
+          desc: { type: "string", optional: true, max: 10000 },
+          url: "url",
+        },
+        shortObject2: {
+          $$type: "object|optional",
+          desc: { type: "string", optional: true, max: 10000 },
+          url: "url",
+        }
+      },
+      handler() {},
+    },
+  },
 }
 ```
 end etc. See test/openapi.mixin.spec.js for examples

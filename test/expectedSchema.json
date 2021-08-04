@@ -59,7 +59,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/ReturnedData",
             "description": "",
             "content": {
               "application/json": {

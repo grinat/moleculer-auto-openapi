@@ -848,10 +848,7 @@ module.exports = {
 
         // merge responses
         if (key === "responses") {
-          orig[key] = this.mergeObjects(
-            orig[key],
-            toMerge[key],
-          );
+          orig[key] = toMerge[key];
           continue;
         }
 

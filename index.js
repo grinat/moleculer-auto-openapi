@@ -852,6 +852,15 @@ module.exports = {
             orig[key],
             toMerge[key],
           );
+
+          // iterate codes
+          for (const code in orig[key]) {
+            // remove $ref if exist content
+            if (orig[key][code] && orig[key][code].content) {
+              delete orig[key][code].$ref;
+            }
+          }
+
           continue;
         }
 

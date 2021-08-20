@@ -59,7 +59,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/ReturnedData",
             "description": "",
             "content": {
               "application/json": {
@@ -296,6 +295,49 @@
           }
         }
       }
+    },
+    "/api/go": {
+      "post": {
+        "summary": "(some.go)",
+        "tags": [
+          "some"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "line": "number",
+                    "text": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "default": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/some.go"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -528,6 +570,18 @@
         },
         "required": [
           "url"
+        ]
+      },
+      "some.go": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "example": null,
+            "type": "number"
+          }
+        },
+        "required": [
+          "line"
         ]
       }
     },

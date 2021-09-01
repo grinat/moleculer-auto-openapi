@@ -25,16 +25,22 @@ const SomeService = {
         responses: {
           200: {
             "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "example": { id: 1, filename: 'foo.txt', mimetype: 'text/plain', sizeInBytes: 100 },
-                  },
-                },
+            "type": { 
+              id: 'number', 
+              filename: 'string', 
+              mimetype: 'string', 
+              sizeInBytes: 'boolean|optional',
+              arrayTest: {
+                type: 'array',
+                items: 'string'
               },
+              objTest: {
+                type: "object",
+                props: {
+                  id: 'string',
+                  test: 'number'
+                }
+              }
             },
           },
           400: {

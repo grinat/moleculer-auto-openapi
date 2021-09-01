@@ -470,12 +470,13 @@ module.exports = {
             },
           };
 
+          const schemaName = action;
+
           if (method === "get" || method === "delete") {
             doc.paths[openapiPath][method].parameters.push(
               ...this.moleculerParamsToQuery(params, addedQueryParams),
             );
           } else {
-            const schemaName = action;
             this.createSchemaFromParams(doc, schemaName, params, addedQueryParams);
             doc.paths[openapiPath][method].requestBody = {
               "content": {
@@ -532,6 +533,29 @@ module.exports = {
               },
             };
           }
+
+          if(openapi && openapi.responses) {
+            const statusCodes = Object.keys(openapi.responses);
+            statusCodes.forEach(statusCode => {
+              if(!Object.keys(openapi.responses[statusCode]).includes('type')) {
+                return;
+              }
+              this.createSchemasFromResponses(doc, schemaName, statusCode, openapi.responses[statusCode].type);
+              doc.paths[openapiPath][method].responses = {
+                ...doc.paths[openapiPath][method].responses,
+                [statusCode] : {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": `#/components/schemas/${schemaName}.response${statusCode}`
+                      }
+                    }
+                  }
+                }
+              };
+            });
+          }
+          
 
           // merge values from action
           doc.paths[openapiPath][method] = this.mergePathItemObjects(
@@ -630,6 +654,128 @@ module.exports = {
       }
 
       return out;
+    },
+    createSchemasFromResponses(doc, schemeName, statusCode, obj, exclude = [], parentNode = {}) {
+      const def = {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        default: parentNode.default,
+      };
+      
+      if(statusCode) {
+        doc.components.schemas[`${schemeName}.response${statusCode}`] = def;
+      } else {
+        doc.components.schemas[schemeName] = def;
+      }
+      
+      for (const fieldName in obj) {
+        // arr or object desc
+        if (fieldName === "$$t") {
+          def.description = obj[fieldName];
+        }
+
+        let node = obj[fieldName];
+        const nextSchemeName = `${schemeName}.${fieldName}`;
+
+        if (
+          // expand $$type: "object|optional"
+          node && node.$$type && node.$$type.includes('object')
+        ) {
+          node = {
+            type: 'object',
+            optional: node.$$type.includes('optional'),
+            $$t: node.$$t || '',
+            props: {
+              ...node,
+            }
+          }
+        } else if (
+          // skip system field in validator scheme
+          fieldName.startsWith("$$")
+        ) {
+          continue;
+        }
+
+        if (exclude.includes(fieldName)) {
+          continue;
+        }
+
+        // expand from short rule to full
+        if (!(node && node.type)) {
+          node = this.expandShortDefinition(node);
+        }
+
+        // mark as required
+        if (node.type === "array") {
+          if (node.min || node.length || node.max) {
+            def.required.push(fieldName);
+            def.minItems = node.length || node.min;
+            def.maxItems = node.length || node.max;
+          }
+          def.unique = node.unique;
+        } else if (!node.optional) {
+          def.required.push(fieldName);
+        }
+
+        // common props
+        def.properties[fieldName] = {
+          description: node.$$t,
+        };
+
+        if (node.type === "object") {
+          def.properties[fieldName] = {
+            ...def.properties[fieldName],
+            $ref: `#/components/schemas/${nextSchemeName}`,
+          };
+          this.createSchemasFromResponses(doc, nextSchemeName, null, node.props, [], node);
+          continue;
+        }
+
+        // array with objects
+        if (node.type === "array" && node.items && node.items.type === "object") {
+          def.properties[fieldName] = {
+            ...def.properties[fieldName],
+            type: "array",
+            default: node.default,
+            unique: node.unique,
+            minItems: node.length || node.min,
+            maxItems: node.length || node.max,
+            items: {
+              $ref: `#/components/schemas/${nextSchemeName}`,
+            },
+          };
+          this.createSchemasFromResponses(doc, nextSchemeName, null, node.items.props, [], node);
+          continue;
+        }
+
+        // simple array
+        if (node.type === "array") {
+          def.properties[fieldName] = {
+            ...def.properties[fieldName],
+            type: "array",
+            items: this.getTypeAndExample({
+              default: node.default,
+              enum: node.enum,
+              type: node.items,
+            }),
+            unique: node.unique,
+            minItems: node.length || node.min,
+            maxItems: node.length || node.max,
+          };
+          continue;
+        }
+
+        // string/number/boolean
+        def.properties[fieldName] = {
+          ...def.properties[fieldName],
+          ...this.getTypeAndExample(node),
+        };
+      }
+
+      if (def.required.length === 0) {
+        delete def.required;
+      }
     },
     /**
      * Convert moleculer params to openapi definitions(components schemas)
@@ -848,6 +994,14 @@ module.exports = {
 
         // merge responses
         if (key === "responses") {
+          let next = false;
+          Object.keys(toMerge[key]).forEach(statusCode => {
+            if(Object.keys(toMerge[key][statusCode]).includes('type')) {
+              next = true;
+              return;
+            }
+          });
+          if(next) continue;
           orig[key] = toMerge[key];
           continue;
         }

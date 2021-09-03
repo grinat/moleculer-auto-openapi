@@ -20,11 +20,23 @@ const OpenapiService = {
 const SomeService = {
   name: "some",
   actions: {
+    contact: {
+      params: {
+        name: 'string'
+      },
+      openapi: {
+        responses: {
+          200: {
+            "interface": "Contact"
+          }
+        }
+      },
+      handler() {}
+    },
     upload: {
       openapi: {
         responses: {
           200: {
-            "description": "",
             "type": { 
               id: 'number', 
               filename: 'string', 
@@ -193,6 +205,7 @@ const ApiService = {
       {
         path: "/api",
         aliases: {
+          "GET contact": "some.contact",
           "PUT upload": "multipart:some.upload",
           "PATCH update/:id": "some.update",
           "GET find": {

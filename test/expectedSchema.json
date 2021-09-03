@@ -50,6 +50,47 @@
                 }
             }
         },
+        "/api/contact": {
+            "get": {
+                "summary": "(some.contact)",
+                "tags": [
+                    "some"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "schema": {
+                            "example": "",
+                            "type": "string",
+                            "minLength": 6,
+                            "maxLength": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/some.contact.response200"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/ServerError"
+                    }
+                }
+            }
+        },
         "/api/upload": {
             "put": {
                 "summary": "(some.upload)",
@@ -59,6 +100,7 @@
                 "parameters": [],
                 "responses": {
                     "200": {
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -309,6 +351,61 @@
             "unknown-action": {
                 "type": "object",
                 "properties": {}
+            },
+            "some.contact.response200": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/some.contact.address"
+                    },
+                    "email": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/some.contact.phone"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "address",
+                    "email"
+                ]
+            },
+            "some.contact.address": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "street": {
+                        "example": "",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "street"
+                ]
+            },
+            "some.contact.phone": {
+                "type": "object",
+                "properties": {
+                    "test": {
+                        "example": "",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "test"
+                ]
             },
             "some.upload": {
                 "type": "object",

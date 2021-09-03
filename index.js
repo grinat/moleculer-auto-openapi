@@ -295,6 +295,8 @@ module.exports = {
       return this.broker.call(`${service}.listAliases`);
     },
     async generateSchema() {
+      const generateInterfaces = require('./interface2json');
+      this.interfaces = await generateInterfaces();
       const doc = JSON.parse(JSON.stringify(this.settings.openapi));
 
       const nodes = await this.fetchServicesWithActions();
@@ -537,13 +539,22 @@ module.exports = {
           if(openapi && openapi.responses) {
             const statusCodes = Object.keys(openapi.responses);
             statusCodes.forEach(statusCode => {
-              if(!Object.keys(openapi.responses[statusCode]).includes('type')) {
+              const responseKeys = Object.keys(openapi.responses[statusCode]);
+              if(!responseKeys.includes('type') && !responseKeys.includes('interface')) {
                 return;
+              }
+              if(responseKeys.includes('interface')) {
+                openapi.responses[statusCode].type = this.interfaces[openapi.responses[statusCode].interface];
+                delete openapi.responses[statusCode].interface;
+                if(!openapi.responses[statusCode].type) {
+                  return console.error('type not found in generated interfaces');
+                }
               }
               this.createSchemasFromResponses(doc, schemaName, statusCode, openapi.responses[statusCode].type);
               doc.paths[openapiPath][method].responses = {
                 ...doc.paths[openapiPath][method].responses,
                 [statusCode] : {
+                  "description": openapi.responses[statusCode].description || '',
                   "content": {
                     "application/json": {
                       "schema": {
@@ -552,11 +563,10 @@ module.exports = {
                     }
                   }
                 }
-              };
+              }
             });
           }
           
-
           // merge values from action
           doc.paths[openapiPath][method] = this.mergePathItemObjects(
             doc.paths[openapiPath][method],

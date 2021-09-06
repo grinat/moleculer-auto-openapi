@@ -20,6 +20,32 @@ const OpenapiService = {
 const SomeService = {
   name: "some",
   actions: {
+    contacttest: {
+      params: {
+        name: 'string'
+      },
+      openapi: {
+        responses: {
+          200: {
+            "interface": "Test"
+          }
+        }
+      },
+      handler() {}
+    },
+    contacttesttwo: {
+      params: {
+        name: 'string'
+      },
+      openapi: {
+        responses: {
+          200: {
+            "interface": "Test2"
+          }
+        }
+      },
+      handler() {}
+    },
     contact: {
       params: {
         name: 'string'
@@ -206,6 +232,8 @@ const ApiService = {
         path: "/api",
         aliases: {
           "GET contact": "some.contact",
+          "GET contact2": "some.contacttest",
+          "GET contact3": "some.contacttesttwo",
           "PUT upload": "multipart:some.upload",
           "PATCH update/:id": "some.update",
           "GET find": {

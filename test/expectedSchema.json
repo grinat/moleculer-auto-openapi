@@ -91,6 +91,88 @@
                 }
             }
         },
+        "/api/contact2": {
+            "get": {
+                "summary": "(some.contacttest)",
+                "tags": [
+                    "some"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "schema": {
+                            "example": "",
+                            "type": "string",
+                            "minLength": 6,
+                            "maxLength": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/some.contacttest.response200"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/ServerError"
+                    }
+                }
+            }
+        },
+        "/api/contact3": {
+            "get": {
+                "summary": "(some.contacttesttwo)",
+                "tags": [
+                    "some"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "schema": {
+                            "example": "",
+                            "type": "string",
+                            "minLength": 6,
+                            "maxLength": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/some.contacttesttwo.response200"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/ServerError"
+                    }
+                }
+            }
+        },
         "/api/upload": {
             "put": {
                 "summary": "(some.upload)",
@@ -406,6 +488,84 @@
                 "required": [
                     "test"
                 ]
+            },
+            "some.contacttest.response200": {
+                "type": "object",
+                "properties": {
+                    "test": {
+                        "$ref": "#/components/schemas/some.contacttest.test"
+                    }
+                },
+                "required": [
+                    "test"
+                ]
+            },
+            "some.contacttest.test": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/some.contacttest.test.address"
+                    },
+                    "email": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/some.contacttest.test.phone"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "address",
+                    "email"
+                ]
+            },
+            "some.contacttest.test.address": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "street": {
+                        "example": "",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "street"
+                ]
+            },
+            "some.contacttest.test.phone": {
+                "type": "object",
+                "properties": {
+                    "test": {
+                        "example": "",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "test"
+                ]
+            },
+            "some.contacttesttwo.response200": {
+                "type": "object",
+                "properties": {
+                    "test": {
+                        "type": "array",
+                        "items": {
+                            "example": "",
+                            "type": "string"
+                        }
+                    }
+                }
             },
             "some.upload": {
                 "type": "object",

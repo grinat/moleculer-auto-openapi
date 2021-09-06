@@ -29,17 +29,33 @@ const getFilesRecursive = async(path) => {
     return filePaths;
 }
 
-const interface2obj = async (path) => {
-    const obj = {};
+const getImports = (interfaceStr, interfacePath) => {
+    return interfaceStr
+        .substring(0, interfaceStr.lastIndexOf('interface'))
+        .trim()
+        .split(';')
+        .filter(str => str.indexOf('import') > -1)
+        .map(str => {
+            str.trim();
+            let name = str.substring(str.indexOf('{') + 1, str.indexOf('}')).trim();
+            name = name.indexOf(' as ') > -1 ? name.split(' as ')[1].trim() : name;
+            let path = str.slice(str.indexOf('from') + 6, -1).trim();
+            path = path.startsWith('./') || path.startsWith('../') ? `${join(interfacePath, '../', path)}.ts` : `${path}.ts`;
+            return { name, path }
+        });
+}
+
+const interface2obj = async (path, obj = {}) => {
     let interfaceStr = await (await readFile(path)).toString();
+    let imports = getImports(interfaceStr, path);
     interfaceStr = interfaceStr.slice(interfaceStr.lastIndexOf('interface'));
     const name = interfaceStr.substring(interfaceStr.indexOf('interface') + 10, interfaceStr.indexOf('{')).trim();
-    parseTypes(interfaceStr.substring(interfaceStr.indexOf('{') + 1, interfaceStr.lastIndexOf('}')).trim(), obj);
+    await parseTypes(interfaceStr.substring(interfaceStr.indexOf('{') + 1, interfaceStr.lastIndexOf('}')).trim(), obj, imports);
     
     return { name, obj }
 }
 
-const parseTypes = (types, obj) => {
+const parseTypes = async (types, obj, imports) => {
     let level = 0;
     for(let i = 0; i < types.length; i++) {
         if(types[i] === '{') {
@@ -52,7 +68,8 @@ const parseTypes = (types, obj) => {
         }
     }
     const props = types.split(';').map(prop => prop.trim());
-    props.forEach(prop => {
+    for(let i = 0; i < props.length; i++) {
+        let prop = props[i];
         if(!prop) return;
         let isOptional = false;
 
@@ -63,6 +80,18 @@ const parseTypes = (types, obj) => {
         }
 
         let propType = prop.substring(prop.indexOf(':') + 1).trim();
+        if(propType.indexOf('|') > -1) {
+            propType
+                .split('|')
+                .map(x => x.trim())
+                .forEach(x => {
+                    if(x === 'undefined' || x === 'null') {
+                        isOptional = true;
+                        return;
+                    }
+                    propType = x;
+                });
+        }
         
         if(simpleTypes.includes(propType)) {
             obj[propName] = isOptional ? `${propType}|optional` : propType;
@@ -87,14 +116,17 @@ const parseTypes = (types, obj) => {
                         },
                         optional: isOptional
                     }
-                    parseTypes(itemType.substring(1, itemType.length - 1).trim(), obj[propName].items.props);
+                    await parseTypes(itemType.substring(1, itemType.length - 1).trim(), obj[propName].items.props, imports);
                 } else {
                     //TODO type is another interface
                     obj[propName] = {
                         type: 'array',
-                        items: itemType,
+                        items: {},
                         optional: isOptional
                     }
+                    const imported = imports.find(x => x.name === itemType);
+                    if(!imported) return;
+                    await interface2obj(imported.path, obj[propName].items);
                 }
             } else {
                 obj[propName] = {
@@ -112,11 +144,20 @@ const parseTypes = (types, obj) => {
                 props: {},
                 optional: isOptional
             }
-            parseTypes(propType.substring(1, propType.length - 1).trim(), obj[propName].props);
-        }
-    });
+            await parseTypes(propType.substring(1, propType.length - 1).trim(), obj[propName].props, imports);
+        } else {
+            obj[propName] = {
+                type: 'object',
+                props: {},
+                optional: isOptional
+            }
+            const imported = imports.find(x => x.name === propType);
+            if(!imported) return;
 
-    //TODO generic interface
+            await interface2obj(imported.path, obj[propName].props);
+        }
+    }
+
     //TODO multiple type 
 }
 
@@ -125,7 +166,7 @@ const generateInterfaces = async () => {
 
     const filePaths = await getFilesRecursive(cwd());
     const interfacePaths = filePaths.filter(path => path.indexOf(input) > -1);
-
+    
     for(let i = 0; i < interfacePaths.length; i++) {
         const path = interfacePaths[i];
         const interfaceAsJSON = await interface2obj(path);

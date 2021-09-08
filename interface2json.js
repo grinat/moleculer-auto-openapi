@@ -3,7 +3,7 @@ const { cwd } = require('process');
 const { join } = require('path');
 
 const excludes = ['node_modules', 'coverage', '.github', '.git', 'dist'];
-const simpleTypes = ['string', 'number', 'boolean', 'null', 'undefined'];
+const simpleTypes = ['string', 'number', 'boolean', 'null', 'undefined', 'any'];
 const result = {}
 
 const getFilesRecursive = async(path) => {

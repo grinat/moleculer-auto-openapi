@@ -158,10 +158,9 @@ const parseTypes = async (types, obj, imports) => {
 }
 
 const generateInterfaces = async () => {
-    let input = '.interface.ts';
 
     const filePaths = await getFilesRecursive(cwd());
-    const interfacePaths = filePaths.filter(path => path.indexOf(input) > -1);
+    const interfacePaths = filePaths.filter(path => path.indexOf('.interface.ts') > -1 || path.indexOf('.dto.ts'));
     
     for(let i = 0; i < interfacePaths.length; i++) {
         const path = interfacePaths[i];

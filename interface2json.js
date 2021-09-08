@@ -118,7 +118,6 @@ const parseTypes = async (types, obj, imports) => {
                     }
                     await parseTypes(itemType.substring(1, itemType.length - 1).trim(), obj[propName].items.props, imports);
                 } else {
-                    //TODO type is another interface
                     obj[propName] = {
                         type: 'array',
                         items: {},
@@ -153,12 +152,9 @@ const parseTypes = async (types, obj, imports) => {
             }
             const imported = imports.find(x => x.name === propType);
             if(!imported) return;
-
             await interface2obj(imported.path, obj[propName].props);
         }
     }
-
-    //TODO multiple type 
 }
 
 const generateInterfaces = async () => {

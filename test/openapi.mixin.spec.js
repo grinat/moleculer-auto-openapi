@@ -207,6 +207,27 @@ const SomeService = {
       },
       handler() {},
     },
+    go: {
+      openapi: {
+        responses: {
+          200: {
+            "description": ``,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": `object`,
+                  "example": { line: `number`, text: `string` },
+                },
+              },
+            },
+          },
+        },
+      },
+      params: {
+        line: { type: `number` },
+      },
+      handler() {},
+    }
   },
 };
 
@@ -253,6 +274,7 @@ const ApiService = {
             },
             action: "some.find",
           },
+          "POST go": "some.go",
         },
       },
       {

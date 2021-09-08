@@ -133,23 +133,12 @@
             }
         },
         "/api/contact3": {
-            "get": {
+            "post": {
                 "summary": "(some.contacttesttwo)",
                 "tags": [
                     "some"
                 ],
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "name",
-                        "schema": {
-                            "example": "",
-                            "type": "string",
-                            "minLength": 6,
-                            "maxLength": 6
-                        }
-                    }
-                ],
+                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "",
@@ -169,6 +158,15 @@
                     },
                     "default": {
                         "$ref": "#/components/responses/ServerError"
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/some.contacttesttwo"
+                            }
+                        }
                     }
                 }
             }
@@ -553,6 +551,46 @@
                 },
                 "required": [
                     "test"
+                ]
+            },
+            "some.contacttesttwo": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/some.contacttesttwo.users"
+                        }
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "some.contacttesttwo.users": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "example": null,
+                        "type": "number"
+                    },
+                    "name": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "status": {
+                        "example": false,
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "status"
                 ]
             },
             "some.contacttesttwo.response200": {

@@ -35,7 +35,18 @@ const SomeService = {
     },
     contacttesttwo: {
       params: {
-        name: 'string'
+        name: 'string',
+        users: { 
+          type: "array", 
+          items: {
+            type: "object", 
+            props: {
+              id: { type: "number", positive: true },
+              name: { type: "string", empty: false },
+              status: "boolean"
+            }
+          } 
+        }
       },
       openapi: {
         responses: {
@@ -233,7 +244,7 @@ const ApiService = {
         aliases: {
           "GET contact": "some.contact",
           "GET contact2": "some.contacttest",
-          "GET contact3": "some.contacttesttwo",
+          "POST contact3": "some.contacttesttwo",
           "PUT upload": "multipart:some.upload",
           "PATCH update/:id": "some.update",
           "GET find": {

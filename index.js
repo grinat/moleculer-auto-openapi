@@ -21,6 +21,20 @@ module.exports = {
     onlyLocal: false, // build schema from only local services
     schemaPath: "/api/openapi/openapi.json",
     uiPath: "/api/openapi/ui",
+    commonPathItemObjectResponses: {
+      200: {
+        $ref: "#/components/responses/ReturnedData",
+      },
+      401: {
+        $ref: "#/components/responses/UnauthorizedError",
+      },
+      422: {
+        $ref: "#/components/responses/ValidationError",
+      },
+      default: {
+        $ref: "#/components/responses/ServerError",
+      },
+    },
     requestBodyAndResponseBodyAreSameOnMethods: [
       /* 'post',
       'patch',
@@ -455,18 +469,7 @@ module.exports = {
             parameters: [...queryParams],
             responses: {
               // attach common responses
-              200: {
-                $ref: "#/components/responses/ReturnedData",
-              },
-              401: {
-                $ref: "#/components/responses/UnauthorizedError",
-              },
-              422: {
-                $ref: "#/components/responses/ValidationError",
-              },
-              default: {
-                $ref: "#/components/responses/ServerError",
-              },
+              ...this.settings.commonPathItemObjectResponses,
             },
           };
 
@@ -500,36 +503,7 @@ module.exports = {
             doc.paths[openapiPath][method] = {
               ...doc.paths[openapiPath][method],
               parameters: [...queryParams],
-              requestBody: {
-                content: {
-                  ...(actionType === "multipart" ? {
-                    "multipart/form-data": {
-                      schema: {
-                        type: "object",
-                        properties: {
-                          file: {
-                            type: "array",
-                            items: {
-                              type: "string",
-                              format: "binary"
-                            },
-                          },
-                          someField: {
-                            type: "string"
-                          }
-                        },
-                      },
-                    },
-                  } : {
-                    "application/octet-stream": {
-                      schema: {
-                        type: "string",
-                        format: "binary",
-                      },
-                    },
-                  }),
-                },
-              },
+              requestBody: this.getFileContentRequestBodyScheme(openapiPath, method, actionType),
             };
           }
 
@@ -607,7 +581,7 @@ module.exports = {
             "schema": {
               "type": "array",
               "items": this.getTypeAndExample({
-                default: node.default,
+                default: node.default ? node.default[0] : undefined,
                 enum: node.enum,
                 type: node.items,
               }),
@@ -620,7 +594,6 @@ module.exports = {
           continue;
         }
 
-        // string/number/boolean
         out.push({
           "in": "query",
           "name": fieldName,
@@ -831,7 +804,7 @@ module.exports = {
       }
 
       out.minLength = node.length || node.min;
-      out.maxLength = node.length || node.min;
+      out.maxLength = node.length || node.max;
 
       return out;
     },
@@ -970,6 +943,38 @@ module.exports = {
 
       return node;
     },
+    getFileContentRequestBodyScheme(openapiPath, method, actionType) {
+      return {
+        content: {
+          ...(actionType === "multipart" ? {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  file: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      format: "binary"
+                    },
+                  },
+                  someField: {
+                    type: "string"
+                  }
+                },
+              },
+            },
+          } : {
+            "application/octet-stream": {
+              schema: {
+                type: "string",
+                format: "binary",
+              },
+            },
+          }),
+        },
+      }
+    }
   },
   started() {
     this.logger.info(`📜OpenAPI Docs server is available at http://0.0.0.0:${this.settings.port}${this.settings.uiPath}`);

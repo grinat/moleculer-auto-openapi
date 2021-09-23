@@ -403,6 +403,8 @@ module.exports = {
         let action = "";
         if (aliasInfo.action) {
           action = aliasInfo.action;
+        } else if (Array.isArray(aliasInfo)) {
+          action = aliasInfo[aliasInfo.length - 1]
         } else if (typeof aliasInfo !== "string") {
           action = UNRESOLVED_ACTION_NAME;
         } else {

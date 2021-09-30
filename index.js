@@ -433,6 +433,15 @@ module.exports = {
       }
 
       return routes;
+    },  
+    /**
+     * gets commonPathItemObjectResponses, if you want to use your own responses, 
+     * overwrite this method in your service and return your own responses.
+     * 
+     * @returns commonPathItemObjectResponses the responses object from path item objects
+     */
+    getCommonPathObjectResponses(){
+      return this.settings.commonPathItemObjectResponses
     },
     attachRoutesToDoc(routes, doc) {
       // route to openapi paths
@@ -469,10 +478,9 @@ module.exports = {
             tags: [service],
             // rawParams: params,
             parameters: [...queryParams],
-            responses: {
+            responses: 
               // attach common responses
-              ...this.settings.commonPathItemObjectResponses,
-            },
+              JSON.parse(JSON.stringify(this.getCommonPathObjectResponses())), 
           };
 
           if (method === "get" || method === "delete") {

@@ -274,9 +274,6 @@ module.exports = {
       },
       handler(ctx) {
         ctx.meta.$responseType = "text/html";
-        ctx.meta.$responseHeaders = {
-          "Content-Security-Policy": `default-src 'self' unpkg.com; img-src 'self' data:; script-src-elem 'self' 'unsafe-inline' unpkg.com`
-        };
 
         return `
       <html>

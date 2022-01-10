@@ -1,3 +1,6 @@
+const swaggerUiAssetPath = require("swagger-ui-dist").getAbsoluteFSPath();
+const fs = require('fs');
+
 const UNRESOLVED_ACTION_NAME = "unknown-action";
 
 const NODE_TYPES = {
@@ -21,6 +24,8 @@ module.exports = {
     onlyLocal: false, // build schema from only local services
     schemaPath: "/api/openapi/openapi.json",
     uiPath: "/api/openapi/ui",
+    // set //unpkg.com/swagger-ui-dist@3.38.0 for fetch assets from unpkg
+    assetsPath: "/api/openapi/assets",
     commonPathItemObjectResponses: {
       200: {
         $ref: "#/components/responses/ReturnedData",
@@ -245,6 +250,20 @@ module.exports = {
         return this.generateSchema();
       },
     },
+    assets: {
+      openapi: {
+        summary: "OpenAPI assets",
+        description: "Return files from swagger-ui-dist folder",
+      },
+      params: {
+        file: { type: "enum", values: [`swagger-ui.css`, `swagger-ui-bundle.js`, `swagger-ui-standalone-preset.js`] },
+      },
+      handler(ctx) {
+        ctx.meta.$responseType = "text/plain";
+
+        return fs.readFileSync(`${swaggerUiAssetPath}/${ctx.params.file}`);
+      }
+    },
     ui: {
       openapi: {
         summary: "OpenAPI ui",
@@ -257,14 +276,13 @@ module.exports = {
         ctx.meta.$responseType = "text/html";
         ctx.meta.$responseHeaders = {
           "Content-Security-Policy": `default-src 'self' unpkg.com; img-src 'self' data:; script-src-elem 'self' 'unsafe-inline' unpkg.com`
-        }
-        const version = '3.38.0';
+        };
 
         return `
       <html>
         <head>
            <title>OpenAPI UI</title>
-           <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@${version}/swagger-ui.css"/>
+           <link rel="stylesheet" href="${this.settings.assetsPath}/swagger-ui.css"/>
         </head>
         <body>
 
@@ -273,8 +291,8 @@ module.exports = {
             <noscript>If you see json, you need to update your moleculer-web to 0.8.0 and moleculer to 0.12</noscript>
           </div>
 
-          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-bundle.js"></script>
-          <script src="//unpkg.com/swagger-ui-dist@${version}/swagger-ui-standalone-preset.js"></script>
+          <script src="${this.settings.assetsPath}/swagger-ui-bundle.js"></script>
+          <script src="${this.settings.assetsPath}/swagger-ui-standalone-preset.js"></script>
           <script>
             window.onload = function() {
              SwaggerUIBundle({

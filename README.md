@@ -124,7 +124,9 @@ module.exports = {
           $$type: "object|optional",
           desc: { type: "string", optional: true, max: 10000 },
           url: "url",
-        }
+        },
+        password: { type: 'string', min: 8, pattern: /^[a-zA-Z0-9]+$/ },
+        password2: { type: 'string', min: 8, pattern: '^[a-zA-Z0-9]+$' }
       },
       handler() {},
     },

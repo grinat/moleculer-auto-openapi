@@ -336,6 +336,38 @@
           }
         }
       }
+    },
+    "/api/some-login": {
+      "post": {
+        "summary": "(some.login)",
+        "tags": [
+          "some"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ReturnedData"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "default": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/some.login"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -583,6 +615,27 @@
         },
         "required": [
           "line"
+        ]
+      },
+      "some.login": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "example": "",
+            "type": "string",
+            "minLength": 8,
+            "pattern": "^[a-zA-Z0-9]+$"
+          },
+          "repeatPassword": {
+            "example": "",
+            "type": "string",
+            "minLength": 8,
+            "pattern": "^[a-zA-Z0-9]+$"
+          }
+        },
+        "required": [
+          "password",
+          "repeatPassword"
         ]
       }
     },

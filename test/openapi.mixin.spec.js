@@ -172,7 +172,14 @@ const SomeService = {
         line: { type: `number` },
       },
       handler() {},
-    }
+    },
+    login: {
+      params: {
+        password: { type: 'string', min: 8, pattern: /^[a-zA-Z0-9]+$/ },
+        repeatPassword: { type: 'string', min: 8, pattern: '^[a-zA-Z0-9]+$' }
+      },
+      handler() {},
+    },
   },
 };
 
@@ -217,6 +224,7 @@ const ApiService = {
             action: "some.find",
           },
           "POST go": "some.go",
+          "POST some-login": "some.login",
         },
       },
       {

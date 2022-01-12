@@ -256,10 +256,23 @@ module.exports = {
         description: "Return files from swagger-ui-dist folder",
       },
       params: {
-        file: { type: "enum", values: [`swagger-ui.css`, `swagger-ui-bundle.js`, `swagger-ui-standalone-preset.js`] },
+        file: {
+          type: "enum",
+          values: [
+            `swagger-ui.css`, `swagger-ui.css.map`,
+            `swagger-ui-bundle.js`, `swagger-ui-bundle.js.map`,
+            `swagger-ui-standalone-preset.js`, `swagger-ui-standalone-preset.js.map`,
+          ]
+        },
       },
       handler(ctx) {
-        ctx.meta.$responseType = "text/plain";
+        if (ctx.params.file.indexOf('.css') > -1) {
+          ctx.meta.$responseType = "text/css";
+        } else if (ctx.params.file.indexOf('.js') > -1) {
+          ctx.meta.$responseType = "text/javascript";
+        } else {
+          ctx.meta.$responseType = "application/octet-stream";
+        }
 
         return fs.readFileSync(`${swaggerUiAssetPath}/${ctx.params.file}`);
       }
@@ -273,7 +286,7 @@ module.exports = {
         url: { $$t: "Schema url", type: "string", optional: true },
       },
       handler(ctx) {
-        ctx.meta.$responseType = "text/html";
+        ctx.meta.$responseType = "text/html; charset=utf-8";
 
         return `
       <html>

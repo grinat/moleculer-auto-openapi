@@ -377,10 +377,15 @@ module.exports = {
             this.buildActionRouteStructFromAliases(route, routes);
           }
 
+          let service = node.name;
           // resolve paths with auto aliases
           const hasAutoAliases = node.settings.routes.some(route => route.autoAliases);
           if (hasAutoAliases) {
-            const autoAliases = await this.fetchAliasesForService(node.name);
+            // suport services that has version, like v1.api
+            if (Object.prototype.hasOwnProperty.call(node, "version") && node.version !== undefined) {
+              service = `v${node.version}.` + service;
+            }
+            const autoAliases = await this.fetchAliasesForService(service);
             const convertedRoute = this.convertAutoAliasesToRoute(autoAliases);
             this.buildActionRouteStructFromAliases(convertedRoute, routes);
           }

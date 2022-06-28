@@ -274,7 +274,7 @@ module.exports = {
           ctx.meta.$responseType = "application/octet-stream";
         }
 
-        return fs.readFileSync(`${swaggerUiAssetPath}/${ctx.params.file}`);
+        return fs.createReadStream(`${swaggerUiAssetPath}/${ctx.params.file}`);
       }
     },
     ui: {

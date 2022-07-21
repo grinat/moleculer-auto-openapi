@@ -26,6 +26,8 @@ module.exports = {
     uiPath: "/api/openapi/ui",
     // set //unpkg.com/swagger-ui-dist@3.38.0 for fetch assets from unpkg
     assetsPath: "/api/openapi/assets",
+    // names of moleculer-web services which contains urls, by default - all
+    collectOnlyFromWebServices: [],
     commonPathItemObjectResponses: {
       200: {
         $ref: "#/components/responses/ReturnedData",
@@ -370,6 +372,10 @@ module.exports = {
       for (const node of nodes) {
         // find routes in web-api service
         if (node.settings && node.settings.routes) {
+
+          if (this.settings.collectOnlyFromWebServices && this.settings.collectOnlyFromWebServices.length > 0 && !this.settings.collectOnlyFromWebServices.includes(node.name)) {
+            continue;
+          }
 
           // iterate each route
           for (const route of node.settings.routes) {

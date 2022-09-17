@@ -259,12 +259,13 @@ module.exports = {
       },
       params: {
         file: {
-          type: "enum",
-          values: [
-            `swagger-ui.css`, `swagger-ui.css.map`,
-            `swagger-ui-bundle.js`, `swagger-ui-bundle.js.map`,
-            `swagger-ui-standalone-preset.js`, `swagger-ui-standalone-preset.js.map`,
-          ]
+          type: 'string',
+          // type: "enum",
+          // values: [
+          //   `swagger-ui.css`, `swagger-ui.css.map`,
+          //   `swagger-ui-bundle.js`, `swagger-ui-bundle.js.map`,
+          //   `swagger-ui-standalone-preset.js`, `swagger-ui-standalone-preset.js.map`,
+          // ]
         },
       },
       handler(ctx) {
@@ -272,6 +273,8 @@ module.exports = {
           ctx.meta.$responseType = "text/css";
         } else if (ctx.params.file.indexOf('.js') > -1) {
           ctx.meta.$responseType = "text/javascript";
+        } else if (ctx.params.file.indexOf('.html') > -1) {
+          ctx.meta.$responseType = "text/html";
         } else {
           ctx.meta.$responseType = "application/octet-stream";
         }

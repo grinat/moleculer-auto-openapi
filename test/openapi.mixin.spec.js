@@ -266,13 +266,13 @@ describe("Test 'openapi' mixin", () => {
   });
 
   it("Asset is returned as a stream", async () => {
-    const file = "swagger-ui-bundle.js.map";
+    const file = "oauth2-redirect.html";
     const path = require("swagger-ui-dist").getAbsoluteFSPath();
-    
+
     const stream = await broker.call("openapi.assets", { file });
 
     const expected = fs.readFileSync(`${path}/${file}`).toString();
-    
+
     let buffer = "";
     i = 0;
     for await (const chunk of stream) {

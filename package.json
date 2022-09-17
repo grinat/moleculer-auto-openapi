@@ -1,5 +1,5 @@
 {
-  "name": "moleculer-auto-openapi",
+  "name": "@charzhou/moleculer-auto-openapi",
   "version": "1.1.5",
   "description": "Auto generate openapi(swagger) scheme for molecular",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/grinat/moleculer-auto-openapi.git"
+    "url": "git+https://github.com/charzhou/moleculer-auto-openapi.git"
   },
   "keywords": [
     "openapi",

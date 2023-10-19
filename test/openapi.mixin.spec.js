@@ -117,7 +117,21 @@ const SomeService = {
           $$type: "object|optional",
           desc: { type: "string", optional: true, max: 10000 },
           url: "url",
-        }
+        },
+        tupleSimple: {
+          type: "tuple", items: ["string", "number"],
+        },
+        tupleDifficult: {
+          type: "tuple", items: [
+            "string",
+            {
+              type: "tuple", empty: false, items: [
+                { type: "number", min: 35, max: 45 },
+                { type: "number", min: -75, max: -65 },
+              ],
+            },
+          ],
+        },
       },
       handler() {},
     },
@@ -268,11 +282,11 @@ describe("Test 'openapi' mixin", () => {
   it("Asset is returned as a stream", async () => {
     const file = "swagger-ui-bundle.js.map";
     const path = require("swagger-ui-dist").getAbsoluteFSPath();
-    
+
     const stream = await broker.call("openapi.assets", { file });
 
     const expected = fs.readFileSync(`${path}/${file}`).toString();
-    
+
     let buffer = "";
     i = 0;
     for await (const chunk of stream) {

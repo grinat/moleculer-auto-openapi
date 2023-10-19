@@ -745,15 +745,16 @@ module.exports = {
         }
 
         // simple array
-        if (node.type === "array") {
+        if (node.type === "array" || node.type === "tuple") {
           def.properties[fieldName] = {
             ...def.properties[fieldName],
             type: "array",
             items: this.getTypeAndExample({
-              default: node.default,
               enum: node.enum,
-              type: node.items,
+              type: node.items && node.items.type ? node.items.type : node.items,
+              values: node.items && node.items.values ? node.items.values : undefined,
             }),
+            default: node.default,
             unique: node.unique,
             minItems: node.length || node.min,
             maxItems: node.length || node.max,
@@ -777,8 +778,13 @@ module.exports = {
         node = {};
       }
       let out = {};
+      let nodeType = node.type;
 
-      switch (node.type) {
+      if (Array.isArray(nodeType)) {
+        nodeType = (nodeType[0] || "string").toString();
+      }
+
+      switch (nodeType) {
         case NODE_TYPES.boolean:
           out = {
             example: false,
@@ -823,7 +829,7 @@ module.exports = {
           out = {
             type: "string",
             enum: node.values,
-            example: node.values ? node.values[0] : undefined,
+            example: Array.isArray(node.values) ? node.values[0] : undefined,
           };
           break;
         default:
@@ -834,7 +840,7 @@ module.exports = {
           break;
       }
 
-      if (node.enum) {
+      if (Array.isArray(node.enum)) {
         out.example = node.enum[0];
         out.enum = node.enum;
       }

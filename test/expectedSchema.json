@@ -497,6 +497,20 @@
           },
           "shortObject2": {
             "$ref": "#/components/schemas/some.update.shortObject2"
+          },
+          "tupleSimple": {
+            "type": "array",
+            "items": {
+              "example": "",
+              "type": "string"
+            }
+          },
+          "tupleDifficult": {
+            "type": "array",
+            "items": {
+              "example": "",
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -509,7 +523,9 @@
           "email",
           "uuid",
           "url",
-          "shortObject"
+          "shortObject",
+          "tupleSimple",
+          "tupleDifficult"
         ],
         "minItems": 1,
         "maxItems": 2

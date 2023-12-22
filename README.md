@@ -1,16 +1,16 @@
-# moleculer-auto-openapi
+# moleculer-auto-openapi-configurable
 Auto generate openapi(swagger) scheme for molecular.
 Scheme generated based on action validation params, routes on all avalaibled services and paths in ApiGateway.
 
 ## Install
 ```shell script
-npm i moleculer-auto-openapi --save
+npm i moleculer-auto-openapi-configurable --save
 ```
 
 ## Usage
 Create openapi.service.js with content:
 ```javascript
-const Openapi = require("moleculer-auto-openapi");
+const Openapi = require("moleculer-auto-openapi-configurable");
 
 module.exports = {
   name: 'openapi',
@@ -37,6 +37,7 @@ module.exports = {
         },
       },
     },
+    excludeRoutes: ['api/openapi']
   },
 }
 ```

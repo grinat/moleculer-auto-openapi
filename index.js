@@ -379,6 +379,9 @@ module.exports = {
 
           // iterate each route
           for (const route of node.settings.routes) {
+            if (this.settings.excludeRoutes.some(excludeRoute => route.path.includes(excludeRoute))) {
+              continue
+            }
             // map standart aliases
             this.buildActionRouteStructFromAliases(route, routes);
           }
@@ -393,6 +396,12 @@ module.exports = {
             }
             const autoAliases = await this.fetchAliasesForService(service);
             const convertedRoute = this.convertAutoAliasesToRoute(autoAliases);
+            convertedRoute.aliases = Object.keys(convertedRoute.aliases)
+              .filter(key => !this.settings.excludeRoutes.some(excludeRoute => key.includes(excludeRoute)))
+              .reduce((acc, key) => {
+                acc[key] = convertedRoute.aliases[key]
+                return acc
+              }, {})
             this.buildActionRouteStructFromAliases(convertedRoute, routes);
           }
         }

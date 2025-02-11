@@ -848,6 +848,11 @@ module.exports = {
       if (node.default) {
         out.default = node.default;
         delete out.example;
+      } else {
+        // Check set example from node value
+        if (node.example) {
+          out.example = node.example;
+        }
       }
 
       out.minLength = node.length || node.min;

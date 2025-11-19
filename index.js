@@ -769,6 +769,11 @@ module.exports = {
         };
       }
 
+      // Add example if parent node has example field
+      if (parentNode.example) {
+        def.example = parentNode.example;
+      }
+
       if (def.required.length === 0) {
         delete def.required;
       }
@@ -848,6 +853,10 @@ module.exports = {
       if (node.default) {
         out.default = node.default;
         delete out.example;
+      }
+      // Check set example from node value
+      if (node.example) {
+        out.example = node.example;
       }
 
       out.minLength = node.length || node.min;

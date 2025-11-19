@@ -977,6 +977,10 @@ module.exports = {
         type: "string",
       };
 
+      if (typeof shortDefinition !== 'string') {
+        return node;
+      }
+
       let params = shortDefinition.split('|');
       params = params.map(v => v.trim());
 

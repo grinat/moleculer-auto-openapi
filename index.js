@@ -28,6 +28,8 @@ module.exports = {
     assetsPath: "/api/openapi/assets",
     // names of moleculer-web services which contains urls, by default - all
     collectOnlyFromWebServices: [],
+    // attribute name to use for getting params schema from actions (default: 'params')
+    paramsAttribute: "params",
     commonPathItemObjectResponses: {
       200: {
         $ref: "#/components/responses/ReturnedData",
@@ -352,13 +354,14 @@ module.exports = {
       return doc;
     },
     attachParamsAndOpenapiFromEveryActionToRoutes(routes, nodes) {
+      const paramsAttr = this.settings.paramsAttribute;
       for (const routeAction in routes) {
         for (const node of nodes) {
           for (const nodeAction in node.actions) {
             if (routeAction === nodeAction) {
               const actionProps = node.actions[nodeAction];
 
-              routes[routeAction].params = actionProps.params || {};
+              routes[routeAction].params = actionProps[paramsAttr] || {};
               routes[routeAction].openapi = actionProps.openapi || null;
               break;
             }
